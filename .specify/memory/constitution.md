@@ -1,55 +1,60 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!-- Sync Impact Report:
+Version change: None -> 1.0.0
+Modified principles: None
+Added sections: Key Standards & Constraints, Success Criteria
+Removed sections: None
+Templates requiring updates:
+- .specify/templates/plan-template.md: ✅ updated
+- .specify/templates/spec-template.md: ✅ updated
+- .specify/templates/tasks-template.md: ✅ updated
+- .specify/templates/commands/*.md: ✅ updated
+- README.md: ⚠ pending
+- docs/quickstart.md: ⚠ pending
+Follow-up TODOs: None
+-->
+# AI-Driven Technical Book Creation with Docusaurus + Integrated RAG Chatbot Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### Precision & Technical Accuracy
+All modules and chapters must exhibit precision and technical accuracy. All explanations must be verifiable and reproducible with real code examples. All technical statements must be validated against official documentation (OpenAI, FastAPI, Docusaurus, Qdrant, Neon, GitHub Pages).
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+### Clarity & Accessibility
+Content must be clear and accessible for beginners while remaining valuable for intermediate developers. Writing tone must be professional, instructor-level, with real-world relevance. Avoid unnecessary theoretical content—focus on actionable knowledge.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### Consistency
+Maintain consistency in structure, terminology, and formatting across the entire book. This includes consistent file naming, folder structure, sidebar organization, and Markdown formatting.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### Spec-Driven AI-Assisted Development
+AI-assisted writing must strictly follow spec-driven workflows: constitution → specs → plans → tasks → implementation. The entire book must be producible through Spec-Kit Plus. The entire creation process must follow the Spec-Kit Plus workflow precisely.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### Practical Applicability
+Content must be practically applicable, actionable, and implementation-ready. Example code must be functional, minimal, and tested. All modules, chapters, and examples must be build-tested.
 
-### [PRINCIPLE_6_NAME]
+### Open Source & Free Tier First
+No proprietary or paid APIs unless required; prefer free-tier services (Qdrant Cloud Free Tier, Neon Free Tier).
 
+## Key Standards & Constraints
 
-[PRINCIPLE__DESCRIPTION]
+- Book format must follow Docusaurus structure (modules → chapters → pages).
+- Version control: all deliverables prepared for GitHub Pages deployment.
+- Must include explicit instructions for:
+    - Docusaurus setup & GitHub Pages deployment
+    - RAG chatbot architecture (OpenAI ChatKit/Agents, FastAPI, Neon, Qdrant)
+    - Embed chatbot inside the published book
+- All chapters must include diagrams, code blocks, and examples.
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+## Success Criteria
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
-
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
-
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+- Complete Docusaurus book generated, structured, and deployable without errors.
+- GitHub Pages deployment successful and documented.
+- Fully functional RAG chatbot integrated directly into the book.
+- Chatbot must answer:
+    - Questions about the whole book
+    - Questions based on user-selected text only.
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+Constitution supersedes all other practices. Amendments require documentation, approval, and a migration plan. All PRs/reviews must verify compliance. Complexity must be justified.
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+**Version**: 1.0.0 | **Ratified**: 2025-12-06 | **Last Amended**: 2025-12-06

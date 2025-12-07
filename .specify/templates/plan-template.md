@@ -31,7 +31,12 @@
 
 *GATE: Must pass before Phase 0 research. Re-check after Phase 1 design.*
 
-[Gates determined based on constitution file]
+- [ ] **Precision & Technical Accuracy**: All technical statements, explanations, and code examples must be verifiable against official documentation (OpenAI, FastAPI, Docusaurus, Qdrant, Neon, GitHub Pages).
+- [ ] **Clarity & Accessibility**: Plan ensures content is clear for beginners and valuable for intermediate developers; avoids unnecessary theoretical content.
+- [ ] **Consistency**: Plan adheres to consistent structure, terminology, formatting, file naming, and folder organization.
+- [ ] **Spec-Driven AI-Assisted Development**: Plan aligns with the constitution -> specs -> plans -> tasks -> implementation workflow and Spec-Kit Plus producibility.
+- [ ] **Practical Applicability**: Proposed implementation is practical, actionable, and includes functional, minimal, and tested code examples.
+- [ ] **Open Source & Free Tier First**: Solution prioritizes open-source tools and free-tier services; justifies any use of proprietary/paid APIs if unavoidable.
 
 ## Project Structure
 
