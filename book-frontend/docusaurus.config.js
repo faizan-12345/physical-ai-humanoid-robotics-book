@@ -49,6 +49,11 @@ const config = {
             position: 'left',
             label: 'Book',
           },
+          {
+            to: '/',
+            label: 'Home',
+            position: 'right',
+          },
         ],
       },
       footer: {
