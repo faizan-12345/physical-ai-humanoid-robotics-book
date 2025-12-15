@@ -3,14 +3,26 @@
 
 import {themes as prismThemes} from 'prism-react-renderer';
 
+// Determine the correct URL and base URL based on environment
+const isDeployedToGitHubPages = process.env.NETLIFY === undefined && process.env.VERCEL === undefined;
+const isDeployedToVercel = process.env.VERCEL === '1';
+
+const siteUrl = isDeployedToVercel
+  ? 'https://physical-ai-humanoid-robotics-book-nu.vercel.app'
+  : 'https://faizan-12345.github.io';
+
+const baseUrl = isDeployedToVercel
+  ? '/'
+  : '/physical-ai-humanoid-robotics-book/';
+
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'Humanoid Robotics Book',
   tagline: 'Practical AI & Robotics',
   favicon: 'img/favicon.ico',
-  url: 'https://faizan-12345.github.io',
-  baseUrl: '/physical-ai-humanoid-robotics-book/',
-  onBrokenLinks: 'ignore',
+  url: siteUrl,
+  baseUrl: baseUrl,
+  onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   i18n: {
     defaultLocale: 'en',
