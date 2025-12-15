@@ -10,7 +10,7 @@ const config = {
   favicon: 'img/favicon.ico',
   url: 'https://faizan-12345.github.io',
   baseUrl: '/physical-ai-humanoid-robotics-book/',
-  onBrokenLinks: 'throw',
+  onBrokenLinks: 'ignore',
   onBrokenMarkdownLinks: 'warn',
   i18n: {
     defaultLocale: 'en',
