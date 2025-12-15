@@ -8,8 +8,8 @@ const config = {
   title: 'Humanoid Robotics Book',
   tagline: 'Practical AI & Robotics',
   favicon: 'img/favicon.ico',
-  url: 'https://your-docusaurus-site.example.com',
-  baseUrl: '/',
+  url: 'https://faizan-12345.github.io',
+  baseUrl: '/physical-ai-humanoid-robotics-book/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   i18n: {
