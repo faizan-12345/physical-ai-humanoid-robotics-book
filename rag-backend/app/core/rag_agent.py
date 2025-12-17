@@ -5,7 +5,7 @@ from app.core.qdrant import get_qdrant_client, query_qdrant
 from dotenv import load_dotenv
 
 # Import the agents components
-from openai_agents import Agent, Runner, OpenAIChatCompletionsModel, AsyncOpenAI, RunConfig
+from agents import Agent, Runner, OpenAIChatCompletionsModel, AsyncOpenAI, RunConfig
 
 load_dotenv()
 

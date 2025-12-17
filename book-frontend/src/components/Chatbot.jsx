@@ -3,7 +3,7 @@ import './Chatbot.css';
 
 // Define the backend API URL as a constant
 // This can be changed to point to a different server if needed
-const BACKEND_API_URL = 'http://localhost:8000';
+const BACKEND_API_URL = 'http://localhost:8001';
 
 const Chatbot = () => {
   const [messages, setMessages] = useState([]);

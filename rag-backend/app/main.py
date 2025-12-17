@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from rag_backend.app.api.endpoints import router as api_router
+from app.api.endpoints import router as api_router
 
 app = FastAPI()
 

@@ -2,7 +2,9 @@
   "permissions": {
     "allow": [
       "Bash(findstr -i \"cohere openai beautifulsoup4 requests\")",
-      "Bash(python populate_docs.py)"
+      "Bash(python populate_docs.py)",
+      "Bash(python -c \"import openai_agents; print(dir(openai_agents))\":*)",
+      "Bash(pip show openai-agents)"
     ]
   }
 }
