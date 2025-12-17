@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(findstr -i \"cohere openai beautifulsoup4 requests\")",
+      "Bash(python populate_docs.py)"
+    ]
+  }
+}

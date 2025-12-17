@@ -10,6 +10,7 @@ const Chatbot = () => {
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [selectedText, setSelectedText] = useState('');
+  const [backendType, setBackendType] = useState('traditional'); // 'traditional' or 'agent'
   const messagesEndRef = useRef(null);
 
   // Function to scroll to the bottom of the chat
@@ -34,7 +35,7 @@ const Chatbot = () => {
     try {
       let response;
       if (isQueryingSelectedText && selectedText) {
-        // Use the /selected-text-query endpoint
+        // Use the /selected-text-query endpoint (traditional RAG)
         response = await fetch(`${BACKEND_API_URL}/selected-text-query`, {
           method: 'POST',
           headers: {
@@ -46,8 +47,9 @@ const Chatbot = () => {
           }),
         });
       } else {
-        // Use the standard /query endpoint
-        response = await fetch(`${BACKEND_API_URL}/query`, {
+        // Use either traditional RAG or agent endpoint based on selection
+        const endpoint = backendType === 'agent' ? '/agent-query' : '/query';
+        response = await fetch(`${BACKEND_API_URL}${endpoint}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -87,6 +89,7 @@ const Chatbot = () => {
       alert('Please select some text on the page first.');
       return;
     }
+    // For selected text queries, we always use the traditional endpoint
     sendMessage(inputValue, true); // Query with selected text
   };
 
@@ -105,6 +108,26 @@ const Chatbot = () => {
     <div className="chatbot-container">
       <div className="chatbot-header">
         <h3>Humanoid Robotics Book Chat</h3>
+        <div className="backend-selector">
+          <label>
+            <input
+              type="radio"
+              value="traditional"
+              checked={backendType === 'traditional'}
+              onChange={(e) => setBackendType(e.target.value)}
+            />
+            Traditional RAG
+          </label>
+          <label>
+            <input
+              type="radio"
+              value="agent"
+              checked={backendType === 'agent'}
+              onChange={(e) => setBackendType(e.target.value)}
+            />
+            Gemini Agent
+          </label>
+        </div>
         <button onClick={getSelectedText} className="select-text-btn" title="Select text on the page for context-specific queries">
           Use Selected Text
         </button>

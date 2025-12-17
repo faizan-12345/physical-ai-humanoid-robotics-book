@@ -3,7 +3,9 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import Dict, Any, List
 from openai import OpenAI
-from rag_backend.app.core.qdrant import get_qdrant_client, create_collection_if_not_exists
+import cohere
+from app.core.qdrant import get_qdrant_client, ensure_collection_exists, query_qdrant
+from app.core.rag_agent import RAGAgent
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
@@ -11,10 +13,10 @@ load_dotenv()
 
 router = APIRouter()
 
-# Initialize OpenAI client
+# Initialize OpenAI client for chat completion (we'll use Cohere for embeddings)
 openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-QDRANT_COLLECTION_NAME = "book_content_embeddings"
+QDRANT_COLLECTION_NAME = "rag_embeddings"
 
 class EmbedRequest(BaseModel):
     text: str
@@ -31,34 +33,42 @@ class QueryResponse(BaseModel):
 async def startup_event():
     # Ensure Qdrant collection exists on startup
     client = get_qdrant_client()
-    create_collection_if_not_exists(client, QDRANT_COLLECTION_NAME)
+    ensure_collection_exists(client, QDRANT_COLLECTION_NAME)
 
 @router.post("/embed")
 async def embed_text(request: EmbedRequest):
     try:
-        # Generate embedding using OpenAI
-        response = openai_client.embeddings.create(
-            input=request.text,
-            model="text-embedding-ada-002" # or other appropriate model
-        )
-        embedding = response.data[0].embedding
+        # This endpoint is now mainly for compatibility, as we'll populate via the script
+        # Generate embedding using Cohere
+        cohere_api_key = os.getenv("COHERE_API_KEY")
+        if not cohere_api_key:
+            raise HTTPException(status_code=500, detail="COHERE_API_KEY not set in environment")
 
-        # Store embedding in Qdrant
+        co = cohere.Client(cohere_api_key)
+        response = co.embed(
+            texts=[request.text],
+            model="embed-english-v3.0",
+            input_type="search_document"
+        )
+        embedding = response.embeddings[0]
+
+        # Store embedding in Qdrant with metadata
         qdrant_client = get_qdrant_client()
-        operation_info = qdrant_client.upsert(
+        import uuid
+        point_id = str(uuid.uuid4())
+
+        qdrant_client.upsert(
             collection_name=QDRANT_COLLECTION_NAME,
             points=[
                 {
+                    "id": point_id,
                     "vector": embedding,
-                    "payload": {"text": request.text, **request.metadata}
+                    "payload": {"text": request.text, "url": request.metadata.get("url", ""), **request.metadata}
                 }
             ]
         )
-        # Qdrant upsert returns a `UpdateResult` object, it does not directly return the ID of the inserted point
-        # For simplicity, we can return a success status. If a specific ID is required, Qdrant allows to set custom IDs
-        # when creating points, but it's not done in this simple example.
 
-        return {"status": "success", "message": "Text embedded and stored.", "operation_id": str(operation_info.operation_id)}
+        return {"status": "success", "message": "Text embedded and stored.", "id": point_id}
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Embedding failed: {e}")
@@ -70,22 +80,11 @@ class SelectedTextQueryRequest(BaseModel):
 @router.post("/query", response_model=QueryResponse)
 async def query_rag(request: QueryRequest):
     try:
-        # 1. Generate embedding for the query
-        query_response = openai_client.embeddings.create(
-            input=request.query,
-            model="text-embedding-ada-002"
-        )
-        query_embedding = query_response.data[0].embedding
-
-        # 2. Search Qdrant for similar content
+        # 1. Search Qdrant for similar content using Cohere embeddings
         qdrant_client = get_qdrant_client()
-        search_results = qdrant_client.search(
-            collection_name=QDRANT_COLLECTION_NAME,
-            query_vector=query_embedding,
-            limit=5 # Retrieve top 5 most similar results
-        )
+        search_results = query_qdrant(qdrant_client, QDRANT_COLLECTION_NAME, request.query, top_k=5)
 
-        # 3. Extract relevant text snippets and metadata
+        # 2. Extract relevant text snippets and metadata
         context_snippets = []
         sources = []
         for result in search_results:
@@ -94,17 +93,19 @@ async def query_rag(request: QueryRequest):
             sources.append({
                 "id": str(result.id),
                 "text_snippet": text_snippet,
-                "metadata": result.payload # Include all metadata from the payload
+                "url": result.payload.get("url", ""),
+                "metadata": {k: v for k, v in result.payload.items() if k not in ['text', 'url']}
             })
 
-        # 4. Combine context snippets
+        # 3. Combine context snippets
         combined_context = "\n\n".join(context_snippets)
 
-        # 5. Use OpenAI to generate an answer based on the context and query
+        # 4. Use OpenAI to generate an answer based on the context and query
         prompt = f"""
         You are a helpful assistant for the Humanoid Robotics Book.
         Use the following retrieved context to answer the user's question.
         If the context does not contain the information needed to answer, say "I couldn't find the information in the book."
+        Be concise and accurate in your response.
 
         Context:
         {combined_context}
@@ -117,11 +118,11 @@ async def query_rag(request: QueryRequest):
         openai_response = openai_client.chat.completions.create(
             model="gpt-3.5-turbo", # or gpt-4, depending on preference
             messages=[
-                {"role": "system", "content": "You are a helpful assistant for the Humanoid Robotics Book. Use the provided context to answer the user's question."},
+                {"role": "system", "content": "You are a helpful assistant for the Humanoid Robotics Book. Use the provided context to answer the user's question. Be concise and accurate."},
                 {"role": "user", "content": prompt}
             ],
             max_tokens=500, # Adjust as needed
-            temperature=0.7 # Adjust for creativity vs. factual accuracy
+            temperature=0.3 # Lower temperature for more factual responses
         )
 
         answer = openai_response.choices[0].message.content
@@ -156,7 +157,7 @@ async def query_selected_text(request: SelectedTextQueryRequest):
                 {"role": "user", "content": prompt}
             ],
             max_tokens=500, # Adjust as needed
-            temperature=0.7 # Adjust for creativity vs. factual accuracy
+            temperature=0.3 # Lower temperature for more factual responses
         )
 
         answer = openai_response.choices[0].message.content
@@ -167,6 +168,17 @@ async def query_selected_text(request: SelectedTextQueryRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Selected text query failed: {e}")
 
-# Include this router in your main FastAPI app:
-# from rag_backend.app.api.endpoints import router as api_router
-# app.include_router(api_router)
+# New endpoint using the RAG Agent with Gemini
+@router.post("/agent-query", response_model=QueryResponse)
+async def query_rag_agent(request: QueryRequest):
+    try:
+        # Initialize the RAG Agent
+        rag_agent = RAGAgent()
+
+        # Query using the agent with Gemini and Qdrant retrieval
+        result = rag_agent.query_with_rag(request.query, top_k=5)
+
+        return QueryResponse(answer=result["answer"], sources=result["sources"])
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"RAG Agent query failed: {e}")

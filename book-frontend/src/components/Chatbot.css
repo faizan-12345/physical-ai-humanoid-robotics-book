@@ -16,11 +16,29 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 .chatbot-header h3 {
   margin: 0;
   font-size: 1.1em;
+  flex-grow: 1;
+}
+
+.backend-selector {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-right: 10px;
+}
+
+.backend-selector label {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.85em;
+  cursor: pointer;
 }
 
 .select-text-btn {
